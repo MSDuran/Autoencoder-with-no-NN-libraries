@@ -83,9 +83,12 @@ int main()
 			{
 				for (size_t j = 0; j < 512; j++)
 				{
-					for (size_t k = 0; k < 512; k++)
+					for (size_t k = 0; k < 512; k+=512)
 					{
-						layer_1.push_back(flattened_images[current_image].at(i) * W_0[k] + B_0[j]);
+						for (size_t l = 0; l < k; l++)
+						{
+							layer_1.push_back(flattened_images[current_image].at(i) * W_0[l] + B_0[j]);
+						}
 					}
 				}
 			}
