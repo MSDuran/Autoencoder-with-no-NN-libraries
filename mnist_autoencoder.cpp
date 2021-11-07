@@ -81,7 +81,7 @@ int main()
 		{
 			for (size_t i = 0; i < WIDTH * HEIGHT; i++)
 			{
-				for (size_t j = 0; j < 512; j++)
+				for (size_t j = 0; j < B_0.size(); j++)
 				{
 					for (size_t k = 0; k < W_0.size(); k += 512)
 					{
