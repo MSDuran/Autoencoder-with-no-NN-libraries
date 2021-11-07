@@ -12,7 +12,7 @@
 #include <random>
 #include <boost/filesystem.hpp>
 
-#define ITERATION_LENGTH 1'000
+#define ITERATION_LENGTH 1
 #define IMAGES_COUNT 70'000
 #define WIDTH 28
 #define HEIGHT 28
@@ -83,7 +83,7 @@ int main()
 			{
 				for (size_t j = 0; j < 512; j++)
 				{
-					for (size_t k = 0; k < 512; k+=512)
+					for (size_t k = 0; k < W_0.size(); k += 512)
 					{
 						for (size_t l = 0; l < k; l++)
 						{
@@ -94,14 +94,15 @@ int main()
 			}
 		}
 	}
-	for (size_t current_image = 0; current_image < image_number; current_image++) // save outputs
-	{
-		cv::normalize(images[current_image], images[current_image], 0, 255, cv::NORM_MINMAX, -1);
-		cv::Mat out_img;
-		cv::resize(images[current_image], out_img, cv::Size(28, 28));
-		cv::imwrite("C:/Users/90543/source/repos/mnist_autoencoder/" + std::to_string(current_image) + ".png", out_img);
-		break;
-	}
+	//for (size_t current_image = 0; current_image < image_number; current_image++) // save outputs
+	//{
+	//	cv::normalize(images[current_image], images[current_image], 0, 255, cv::NORM_MINMAX, -1);
+	//	cv::Mat out_img;
+	//	cv::resize(images[current_image], out_img, cv::Size(28, 28));
+	//	cv::imwrite("C:/Users/90543/source/repos/mnist_autoencoder/" + std::to_string(current_image) + ".png", out_img);
+	//	break;
+	//}
+
 	//784(input) ---> 512 --> 20(latent space) --> 512 --> 784(output) 
 	return 0;
 }
