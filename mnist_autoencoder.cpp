@@ -99,7 +99,7 @@ int main()
 					//myfile << i << " " << j << " " << j / 512 << " " << j % 512 << "\n";
 					if (j % 512 == i)
 					{
-						layer_1.push_back(sum + B_0[j / 512]); // layer_1.size() = 512 olmalı
+						layer_1.push_back(sum + B_0[j % 512]); // layer_1.size() = 512 olmalı
 					}
 				}
 			}
