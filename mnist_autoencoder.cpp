@@ -80,6 +80,8 @@ int main()
 		break;
 	}
 	image_number = 1;
+	float sum = 0.0;
+	size_t j = 0;
 	std::vector<float> W_0(WIDTH * HEIGHT * 512);
 	std::vector<float> B_0(512);
 	std::vector<float> layer_1;
@@ -91,19 +93,20 @@ int main()
 		{
 			for (size_t i = 0; i < 784; i++)
 			{
-				float sum = 0.0;
-				for (size_t j = i * 512; j < 512 * i + 512; j++)
+				sum = 0.0;
+				for (j = i * 512; j < 512 * i + 512; j++)
 				{
+					//if (flattened_images[current_image].at(i)!=0) // may be used for optimization
 					sum += flattened_images[current_image].at(i) * W_0[j];
 					myfile << "i: " << i << " j: " << j << " " << sum << "\n"; // hata burda
-					//myfile << i << " " << j << " " << j / 512 << " " << j % 512 << "\n";
-					if (j % 512 == i)
+					if (j % 512 == i && i > 0)
 					{
 						layer_1.push_back(sum + B_0[j % 512]); // layer_1.size() = 512 olmalı
 					}
 				}
 			}
-			std::for_each(layer_1.begin(), layer_1.end(), &sigmoid);
+			layer_1.push_back(sum + B_0[j % 512]);
+			std::for_each(layer_1.begin(), layer_1.end(), sigmoid); //activation function
 			for (auto x : layer_1)
 			{
 				weights << "sigmoid: " << x << "\n";
