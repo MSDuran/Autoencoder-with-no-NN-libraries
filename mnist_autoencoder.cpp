@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <random>
 #include <boost/filesystem.hpp>
+#include <fstream>
 
 #define ITERATION_LENGTH 1
 #define IMAGES_COUNT 70'000
@@ -47,6 +48,9 @@ int main()
 				std::cout << image_number << '\n';
 		}
 	}
+	std::ofstream myfile, weights;
+	myfile.open("example.txt");
+	weights.open("weights.txt");
 	std::cout << "Total images:" << image_number << "\n";
 	std::vector<std::vector<float>> flattened_images;
 	for (size_t current_image = 0; current_image < image_number; current_image++) // normalize each input
@@ -70,39 +74,42 @@ int main()
 		//if (current_image == 5'000)
 		break;
 	}
+	image_number = 1;
 	std::vector<float> W_0(WIDTH * HEIGHT * 512);
 	std::vector<float> B_0(512);
-	std::vector<float> layer_1(512);
+	std::vector<float> layer_1;
 	std::generate_n(W_0.begin(), WIDTH * HEIGHT * 512, generate_random_float);
-	std::generate_n(B_0.begin(), 512, std::mt19937{ std::random_device{}() });
+	std::generate_n(B_0.begin(), 512, generate_random_float);
 	for (size_t iteration_count = 0; iteration_count < ITERATION_LENGTH; iteration_count++)
 	{
-		for (size_t current_image = 0; current_image < image_number; current_image++) // train
+		for (size_t current_image = 0; current_image < image_number; current_image++) // training
 		{
-			for (size_t i = 0; i < WIDTH * HEIGHT; i++)
+			for (size_t i = 0; i < 512; i++)
 			{
-				for (size_t j = 0; j < B_0.size(); j++)
+				float sum = 0.0;
+				for (size_t j = i * 784; j < 784 * i + 784; j++)
 				{
-					for (size_t k = 0; k < W_0.size(); k += 512)
-					{
-						for (size_t l = 0; l < k; l++)
-						{
-							layer_1.push_back(flattened_images[current_image].at(i) * W_0[l] + B_0[j]);
-						}
-					}
+					sum += flattened_images[current_image].at(i) * W_0[j];
+					myfile << "i: " << i << " j: " << j << " " << sum << "\n"; // hata burda
 				}
+				layer_1.push_back(sum + B_0[i]); // layer_1.size() = 512 olmalı
+				weights << i << " " << layer_1[i] << "\n";
 			}
+			myfile << "layer1 size: " << layer_1.size();
 		}
 	}
+
+	myfile.close();
+	weights.close();
 	//for (size_t current_image = 0; current_image < image_number; current_image++) // save outputs
 	//{
-	//	cv::normalize(images[current_image], images[current_image], 0, 255, cv::NORM_MINMAX, -1);
-	//	cv::Mat out_img;
-	//	cv::resize(images[current_image], out_img, cv::Size(28, 28));
-	//	cv::imwrite("C:/Users/90543/source/repos/mnist_autoencoder/" + std::to_string(current_image) + ".png", out_img);
-	//	break;
+	// cv::normalize(images[current_image], images[current_image], 0, 255, cv::NORM_MINMAX, -1);
+	// cv::Mat out_img;
+	// cv::resize(images[current_image], out_img, cv::Size(28, 28));
+	// cv::imwrite("C:/Users/90543/source/repos/mnist_autoencoder/" + std::to_string(current_image) + ".png", out_img);
+	// break;
 	//}
 
-	//784(input) ---> 512 --> 20(latent space) --> 512 --> 784(output) 
+	//784(input) ---> 512 --> 20(latent space) --> 512 --> 784(output)
 	return 0;
 }
