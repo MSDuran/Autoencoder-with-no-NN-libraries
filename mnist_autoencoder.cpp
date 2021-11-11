@@ -12,6 +12,8 @@
 #include <random>
 #include <boost/filesystem.hpp>
 #include <fstream>
+#include <cmath>
+#include <algorithm>
 
 #define ITERATION_LENGTH 1
 #define IMAGES_COUNT 70'000
@@ -24,7 +26,10 @@ float generate_random_float() {
 		value += 0.4;
 	return value;
 }
-
+void sigmoid(float& x) {
+	//std::cout << 1.0 / (1.0 + std::exp(-x))<<"\n";
+	x = 1.0 / (1.0 + std::exp(-x));
+}
 int main()
 {
 	std::vector<cv::Mat> images;
@@ -84,16 +89,24 @@ int main()
 	{
 		for (size_t current_image = 0; current_image < image_number; current_image++) // training
 		{
-			for (size_t i = 0; i < 512; i++)
+			for (size_t i = 0; i < 784; i++)
 			{
 				float sum = 0.0;
-				for (size_t j = i * 784; j < 784 * i + 784; j++)
+				for (size_t j = i * 512; j < 512 * i + 512; j++)
 				{
 					sum += flattened_images[current_image].at(i) * W_0[j];
 					myfile << "i: " << i << " j: " << j << " " << sum << "\n"; // hata burda
+					//myfile << i << " " << j << " " << j / 512 << " " << j % 512 << "\n";
+					if (j % 512 == i)
+					{
+						layer_1.push_back(sum + B_0[j / 512]); // layer_1.size() = 512 olmalı
+					}
 				}
-				layer_1.push_back(sum + B_0[i]); // layer_1.size() = 512 olmalı
-				weights << i << " " << layer_1[i] << "\n";
+			}
+			std::for_each(layer_1.begin(), layer_1.end(), &sigmoid);
+			for (auto x : layer_1)
+			{
+				weights << "sigmoid: " << x << "\n";
 			}
 			myfile << "layer1 size: " << layer_1.size();
 		}
