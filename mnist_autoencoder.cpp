@@ -85,8 +85,13 @@ int main()
 	std::vector<float> W_0(WIDTH * HEIGHT * 512);
 	std::vector<float> B_0(512);
 	std::vector<float> layer_1;
+	std::vector<float> W_1(512 * 20);
+	std::vector<float> B_1(20);
+	std::vector<float> layer_2;
 	std::generate_n(W_0.begin(), WIDTH * HEIGHT * 512, generate_random_float);
 	std::generate_n(B_0.begin(), 512, generate_random_float);
+	std::generate_n(W_1.begin(), 512 * 20, generate_random_float);
+	std::generate_n(B_1.begin(), 20, generate_random_float);
 	for (size_t iteration_count = 0; iteration_count < ITERATION_LENGTH; iteration_count++)
 	{
 		for (size_t current_image = 0; current_image < image_number; current_image++) // training
@@ -97,7 +102,7 @@ int main()
 				for (j = i * 512; j < 512 * i + 512; j++)
 				{
 					//if (flattened_images[current_image].at(i)!=0) // may be used for optimization
-					sum += flattened_images[current_image].at(i) * W_0[j];
+					sum += flattened_images[current_image].at(i) * W_0[j % 512];
 					myfile << "i: " << i << " j: " << j << " " << sum << "\n"; // hata burda
 					if (j % 512 == i && i > 0)
 					{
@@ -107,11 +112,27 @@ int main()
 			}
 			layer_1.push_back(sum + B_0[j % 512]);
 			std::for_each(layer_1.begin(), layer_1.end(), sigmoid); //activation function
+			std::cout << "done\n";
 			for (auto x : layer_1)
 			{
 				weights << "sigmoid: " << x << "\n";
 			}
 			myfile << "layer1 size: " << layer_1.size();
+			j = 0;
+			for (size_t i = 0; i < 512; i++)
+			{
+				sum = 0.0;
+				for (j = i * 20; j < 20 * i + 20; j++)
+				{
+					sum += layer_1[i] * W_1[j % 20];
+					if (j % 20 == i && i > 0)
+					{
+						layer_2.push_back(sum + B_1[j % 20]); // layer_1.size() = 512 olmalı
+					}
+				}
+			}
+			layer_2.push_back(sum + B_1[j % 20]);
+			std::for_each(layer_2.begin(), layer_2.end(), sigmoid); //activation function
 		}
 	}
 
